@@ -72,7 +72,7 @@ router.post("/user/log_in", async (req, res) => {
     // check user exist
     const user = await User.findOne({ email: req.fields.email });
     if (!user) {
-      return res.status(400).json({ error: { message: "unkown user" } });
+      return res.status(404).json({ error: { message: "unkown user" } });
     }
     const hash = SHA256(req.fields.password + user.salt).toString(encBase64);
     console.log(hash, user.hash);
