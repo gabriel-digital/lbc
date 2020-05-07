@@ -81,7 +81,7 @@ router.post("/user/log_in", async (req, res) => {
       return res.status(400).json({ error: { message: "invalid password" } });
     }
     // everything's fine, welcome user !
-    return res.json({ user.account.username, user.account.token, message: `Welcome ${user.account.username} !` });
+    return res.json({ username: user.account.username, token: user.token, message: `Welcome ${user.account.username} !` });
   } catch (error) {
     return res.status(400).json({ message: error.message });
   }
