@@ -148,6 +148,7 @@ router.get("/offer/:id", async (req, res) => {
         price: offer.price,
         creator: offer.creator,
         created: offer.created,
+       picture: offer.picture
       });
     }
   } catch (error) {
