@@ -134,7 +134,6 @@ show offer with id
 router.get("/offer/:id", async (req, res) => {
   try {
     const offer = await Offer.findById(req.params.id)
-      .select("-picture")
       .populate({
         path: "creator",
         select: "-hash -salt -token -email -__v",
