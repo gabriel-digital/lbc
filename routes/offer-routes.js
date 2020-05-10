@@ -20,7 +20,7 @@ router.post("/offer/publish", isAuthenticated, async (req, res) => {
     //check arguments are correct
     if (
       req.fields.title.length > 50 ||
-      req.fields.description.length > 500 ||
+      req.fields.description.length > 1000 ||
       req.fields.price > 100000
     ) {
       return res.status(400).json({ error: { message: "Invalid data" } });
