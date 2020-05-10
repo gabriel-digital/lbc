@@ -110,7 +110,6 @@ router.get("/offer/with-count", async (req, res) => {
       .sort(sort)
       .limit(limit)
       .skip(skip)
-      .select("-picture")
       .populate({
         path: "creator",
         select: "-hash -salt -token -email -__v",
