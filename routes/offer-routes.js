@@ -96,28 +96,33 @@ router.get("/offer/with-count", async (req, res) => {
         sort["created"] = "asc";
         break;
     }
-    const count = await Offer.countDocuments(filters);
-    let offers;
+
     //pagination
-    let page = Number(req.query.page);
-    if (!page) {
-      // Forcer à afficher la première page
-      page = 1;
+    let limit = 0;
+    let skip = 0;
+    if (req.query.page && req.query.page > 0) {
+      skip = limit * (req.query.page - 1);
     }
+    // for pages checks, we first need count, see below
 
-    let limit = 5;
-
-    // all settings done, let's find & answer ssome offers
+    // all settings done, let's find & answer something
     const offers = await Offer.find(search)
       .sort(sort)
       .limit(limit)
-      .skip((page - 1) * limit)
+      .skip(skip)
       .populate({
         path: "creator",
         select: "-hash -salt -token -email -__v",
       });
-
-    return res.json({ count: count, offers: offers });
+    const count = offers.length;
+    const pages = count / limit;
+    // now we can limit pagination
+    if (req.query.page > pages) {
+      return res
+        .status(400)
+        .json({ error: { message: "Invalid page number" } });
+    }
+    return res.json({ pages: pages, offers: offers });
   } catch (error) {
     return res.status(400).json({ error: error.message });
   }
