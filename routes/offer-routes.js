@@ -96,33 +96,28 @@ router.get("/offer/with-count", async (req, res) => {
         sort["created"] = "asc";
         break;
     }
-
+    const count = await Offer.countDocuments(filters);
+    let offers;
     //pagination
-    let limit = 0;
-    let skip = 0;
-    if (req.query.page && req.query.page > 0) {
-      skip = limit * (req.query.page - 1);
+    let page = Number(req.query.page);
+    if (!page) {
+      // Forcer à afficher la première page
+      page = 1;
     }
-    // for pages checks, we first need count, see below
 
-    // all settings done, let's find & answer something
+    let limit = 5;
+
+    // all settings done, let's find & answer ssome offers
     const offers = await Offer.find(search)
       .sort(sort)
       .limit(limit)
-      .skip(skip)
+      .skip((page - 1) * limit)
       .populate({
         path: "creator",
         select: "-hash -salt -token -email -__v",
       });
-    const count = offers.length;
-    const pages = count / limit;
-    // now we can limit pagination
-    if (req.query.page > pages) {
-      return res
-        .status(400)
-        .json({ error: { message: "Invalid page number" } });
-    }
-    return res.json({ pages: pages, offers: offers });
+
+    return res.json({ count: count, offers: offers });
   } catch (error) {
     return res.status(400).json({ error: error.message });
   }
@@ -133,11 +128,10 @@ show offer with id
 ************************* */
 router.get("/offer/:id", async (req, res) => {
   try {
-    const offer = await Offer.findById(req.params.id)
-      .populate({
-        path: "creator",
-        select: "-hash -salt -token -email -__v",
-      });
+    const offer = await Offer.findById(req.params.id).populate({
+      path: "creator",
+      select: "-hash -salt -token -email -__v",
+    });
     if (!offer) {
       return res.status(400).json({ error: { message: "invalid ID" } });
     } else {
@@ -148,7 +142,7 @@ router.get("/offer/:id", async (req, res) => {
         price: offer.price,
         creator: offer.creator,
         created: offer.created,
-       picture: offer.picture
+        picture: offer.picture,
       });
     }
   } catch (error) {
