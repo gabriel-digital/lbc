@@ -98,7 +98,7 @@ router.get("/offer/with-count", async (req, res) => {
     }
 
     //pagination
-    let limit = 10;
+    let limit = 0;
     let skip = 0;
     if (req.query.page && req.query.page > 0) {
       skip = limit * (req.query.page - 1);
