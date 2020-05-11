@@ -98,7 +98,7 @@ router.get("/offer/with-count", async (req, res) => {
     }
 
     //pagination
-    let limit = 0;
+    let limit = 10;
     let skip = 0;
     if (req.query.page && req.query.page > 0) {
       skip = limit * (req.query.page - 1);
@@ -122,7 +122,7 @@ router.get("/offer/with-count", async (req, res) => {
         .status(400)
         .json({ error: { message: "Invalid page number" } });
     }
-    return res.json({ count: count, offers: offers });
+    return res.json({ pages: pages, offers: offers });
   } catch (error) {
     return res.status(400).json({ error: error.message });
   }
