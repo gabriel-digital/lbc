@@ -1,19 +1,19 @@
 //import dependencies
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const cloudinary = require("cloudinary").v2;
-const Offer = require("../models/offer-model");
-const isAuthenticated = require("../middlewares/is-authenticated");
+const cloudinary = require('cloudinary').v2;
+const Offer = require('../models/offer-model');
+const isAuthenticated = require('../middlewares/is-authenticated');
 
 /* ************************** 
  publish offer 
  ************************* */
-router.post("/offer/publish", isAuthenticated, async (req, res) => {
+router.post('/offer/publish', isAuthenticated, async (req, res) => {
   try {
     // check all arguments are here
     if (!req.fields.title || !req.fields.description || !req.fields.price) {
       return res.status(400).json({
-        error: { message: "Missing title, description, price or user" },
+        error: { message: 'Missing title, description, price or user' },
       });
     }
 
@@ -23,7 +23,7 @@ router.post("/offer/publish", isAuthenticated, async (req, res) => {
       req.fields.description.length > 1000 ||
       req.fields.price > 100000
     ) {
-      return res.status(400).json({ error: { message: "Invalid data" } });
+      return res.status(400).json({ error: { message: 'Invalid data' } });
     }
 
     // upload file to cloudinary
@@ -65,35 +65,35 @@ router.post("/offer/publish", isAuthenticated, async (req, res) => {
 /* ************************** 
 show offers and filter 
 ************************* */
-router.get("/offer/with-count", async (req, res) => {
+router.get('/offers/with-count', async (req, res) => {
   try {
     // filter by title & min/max price
     let search = {};
     if (req.query.title) {
-      search["title"] = new RegExp(req.query.title, "i");
+      search['title'] = new RegExp(req.query.title, 'i');
     }
     if (req.query.priceMin && req.query.priceMax) {
-      search["price"] = { $gte: req.query.priceMin, $lte: req.query.priceMax };
+      search['price'] = { $gte: req.query.priceMin, $lte: req.query.priceMax };
     } else if (req.query.priceMin) {
-      search["price"] = { $gte: req.query.priceMin };
+      search['price'] = { $gte: req.query.priceMin };
     } else if (req.query.priceMax) {
-      search["price"] = { $lte: req.query.priceMax };
+      search['price'] = { $lte: req.query.priceMax };
     }
 
     // sort by date & price
     let sort = {};
     switch (req.query.sort) {
-      case "price-desc":
-        sort["price"] = "desc";
+      case 'price-desc':
+        sort['price'] = 'desc';
         break;
-      case "price-asc":
-        sort["price"] = "asc";
+      case 'price-asc':
+        sort['price'] = 'asc';
         break;
-      case "date-desc":
-        sort["created"] = "desc";
+      case 'date-desc':
+        sort['created'] = 'desc';
         break;
-      case "date-asc":
-        sort["created"] = "asc";
+      case 'date-asc':
+        sort['created'] = 'asc';
         break;
     }
 
@@ -111,8 +111,8 @@ router.get("/offer/with-count", async (req, res) => {
       .limit(limit)
       .skip(skip)
       .populate({
-        path: "creator",
-        select: "-hash -salt -token -email -__v",
+        path: 'creator',
+        select: '-hash -salt -token -email -__v',
       });
     const count = offers.length;
     const pages = count / limit;
@@ -120,7 +120,7 @@ router.get("/offer/with-count", async (req, res) => {
     if (req.query.page > pages) {
       return res
         .status(400)
-        .json({ error: { message: "Invalid page number" } });
+        .json({ error: { message: 'Invalid page number' } });
     }
     return res.json({ pages: pages, offers: offers });
   } catch (error) {
@@ -131,14 +131,14 @@ router.get("/offer/with-count", async (req, res) => {
 /* ************************** 
 show offer with id 
 ************************* */
-router.get("/offer/:id", async (req, res) => {
+router.get('/offer/:id', async (req, res) => {
   try {
     const offer = await Offer.findById(req.params.id).populate({
-      path: "creator",
-      select: "-hash -salt -token -email -__v",
+      path: 'creator',
+      select: '-hash -salt -token -email -__v',
     });
     if (!offer) {
-      return res.status(400).json({ error: { message: "invalid ID" } });
+      return res.status(400).json({ error: { message: 'invalid ID' } });
     } else {
       return res.json({
         _id: offer._id,
@@ -158,15 +158,15 @@ router.get("/offer/:id", async (req, res) => {
 /* ************************** 
 delete offer 
 ************************* */
-router.delete("/offer/delete", async (req, res) => {
+router.delete('/offer/delete', async (req, res) => {
   // check id exist
   const found = await Offer.findById(req.fields.offerId);
   if (!found) {
-    return res.status(400).json({ error: { message: "invalid ID" } });
+    return res.status(400).json({ error: { message: 'invalid ID' } });
   } else {
     //if so, delete !
     await Offer.findByIdAndDelete(req.fields.offerId);
-    return res.json({ message: "Offer deleted" });
+    return res.json({ message: 'Offer deleted' });
   }
 });
 
