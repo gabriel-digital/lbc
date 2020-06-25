@@ -1,28 +1,28 @@
 //import dependencies
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const SHA256 = require("crypto-js/sha256");
-const encBase64 = require("crypto-js/enc-base64");
-const uid2 = require("uid2");
-const User = require("../models/user-model");
+const SHA256 = require('crypto-js/sha256');
+const encBase64 = require('crypto-js/enc-base64');
+const uid2 = require('uid2');
+const User = require('../models/user-model');
 
 /* ************* 
  user sign up 
  ************ */
-router.post("/user/sign_up", async (req, res) => {
+router.post('/user/sign_up', async (req, res) => {
   try {
     console.log(req.fields);
     // check username exist in query
     if (!req.fields.username || !req.fields.email || !req.fields.password) {
       return res
         .status(400)
-        .json({ error: { message: "missing username, email or password" } });
+        .json({ error: { message: 'missing username, email or password' } });
     }
 
     // check mail isn't already used
     const found = await User.findOne({ email: req.fields.email });
     if (found) {
-      return res.status(400).json({ error: { message: "mail already taken" } });
+      return res.status(400).json({ error: { message: 'mail already taken' } });
     }
 
     // everthing's fine, let's create a new user !
@@ -61,30 +61,52 @@ router.post("/user/sign_up", async (req, res) => {
 /* ************* 
  user log in
  ************ */
-router.post("/user/log_in", async (req, res) => {
+router.post('/user/log_in', async (req, res) => {
   try {
     // check we have a useranme & password
     if (!req.fields.email || !req.fields.password) {
       return res
         .status(400)
-        .json({ error: { message: "email or password missing" } });
+        .json({ error: { message: 'email or password missing' } });
     }
     // check user exist
     const user = await User.findOne({ email: req.fields.email });
     if (!user) {
-      return res.status(404).json({ error: { message: "unkown user" } });
+      return res.status(404).json({ error: { message: 'unkown user' } });
     }
     const hash = SHA256(req.fields.password + user.salt).toString(encBase64);
     console.log(hash, user.hash);
     // check password
     if (hash !== user.hash) {
-      return res.status(400).json({ error: { message: "invalid password" } });
+      return res.status(400).json({ error: { message: 'invalid password' } });
     }
     // everything's fine, welcome user !
-    return res.json({ username: user.account.username, token: user.token, message: `Welcome ${user.account.username} !` });
+    return res.json({
+      username: user.account.username,
+      token: user.token,
+      message: `Welcome ${user.account.username} !`,
+    });
   } catch (error) {
     return res.status(400).json({ message: error.message });
   }
 });
 
+/* ************* 
+ get user with id
+ ************ */
+router.get('/user/:id', async (req, res) => {
+  try {
+    // check user exist
+    const user = await User.findOne({ _id: req.params.id });
+    if (!user) {
+      return res.status(404).json({ error: { message: 'unkown user' } });
+    }
+    // everything's fine, welcome user !
+    return res.json({
+      user,
+    });
+  } catch (error) {
+    return res.status(400).json({ message: error.message });
+  }
+});
 module.exports = router;
