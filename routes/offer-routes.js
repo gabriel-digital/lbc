@@ -126,7 +126,7 @@ router.get('/offers/with-count', async (req, res) => {
         .status(400)
         .json({ error: { message: 'Invalid page number' } });
     }
-    return res.json({ pages: pages, offers: offers });
+    return res.json({ pages: pages, offers: offers, total: totalOffers });
   } catch (error) {
     return res.status(400).json({ error: error.message });
   }
