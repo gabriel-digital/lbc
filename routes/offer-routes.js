@@ -73,13 +73,13 @@ router.get('/offers/with-count', async (req, res) => {
     if (req.query.title) {
       search['title'] = new RegExp(req.query.title, 'i');
     }
-    if (req.query.priceMin || req.query.priceMax) {
-      const min = 0;
-      search['price'] = { $gte: req.query.priceMin || min, $lte: req.query.priceMax };
-    } else if (req.query.priceMin) {
-      search['price'] = { $gte: req.query.priceMin || min };
-    } else if (req.query.priceMax) {
-      search['price'] = { $lte: req.query.priceMax };
+    if (req.query.priceMin && req.query.priceMax) {
+  
+      search['price'] = { $gte: req.query.priceMin, $lte: req.query.priceMax };
+    } else if (req.query.priceMin && !req.query.max) {
+      search['price'] = { $gte: req.query.priceMin };
+    } else if (req.query.priceMax && req.query.min) {
+      search['price'] = { $gte: 0, $lte: req.query.priceMax };
     }
 
     // sort by date & price
