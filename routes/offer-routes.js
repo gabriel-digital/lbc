@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const cloudinary = require('cloudinary').v2;
+const mongoose = require("mongoose");
 const Offer = require('../models/offer-model');
 const isAuthenticated = require('../middlewares/is-authenticated');
 
@@ -149,6 +150,26 @@ router.get('/offer/:id', async (req, res) => {
         created: offer.created,
         picture: offer.picture,
       });
+    }
+  } catch (error) {
+    return res.status(400).json({ error: error.message });
+  }
+});
+
+/* ************************** 
+show offers with user id 
+************************* */
+router.get('/offers/user/:id', async (req, res) => {
+  try {
+
+    const offers = await Offer.find({ creator: mongoose.Types.ObjectId(User._id)});
+    console.log(offers)
+    if (!offers || offers.length === 0) {
+      return res
+        .status(400)
+        .json({ error: { message: 'No offers found for this user' } });
+    } else {
+      return res.json(offers);
     }
   } catch (error) {
     return res.status(400).json({ error: error.message });
