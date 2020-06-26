@@ -106,7 +106,9 @@ router.get('/offers/with-count', async (req, res) => {
       skip = limit * (req.query.page - 1);
     }
     // for pages checks, we first need count, see below
-
+    const totalOffers = await Offer.find(search)
+    const count = totalOffers.length;
+    const pages = Math.ceil(count / limit);
     // all settings done, let's find & answer something
     const offers = await Offer.find(search)
       .sort(sort)
@@ -116,8 +118,8 @@ router.get('/offers/with-count', async (req, res) => {
         path: 'creator',
         select: '-hash -salt -token -email -__v',
       });
-    const count = offers.length;
-    const pages = count / limit;
+    
+    
     // now we can limit pagination
     if (req.query.page > pages) {
       return res
