@@ -11,7 +11,6 @@ const User = require('../models/user-model');
  ************ */
 router.post('/user/sign_up', async (req, res) => {
   try {
-    console.log(req.fields);
     // check username exist in query
     if (!req.fields.username || !req.fields.email || !req.fields.password) {
       return res
@@ -75,7 +74,6 @@ router.post('/user/log_in', async (req, res) => {
       return res.status(404).json({ error: { message: 'unkown user' } });
     }
     const hash = SHA256(req.fields.password + user.salt).toString(encBase64);
-    console.log(hash, user.hash);
     // check password
     if (hash !== user.hash) {
       return res.status(400).json({ error: { message: 'invalid password' } });

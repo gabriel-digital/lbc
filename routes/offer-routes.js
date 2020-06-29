@@ -164,7 +164,7 @@ router.get('/offers/user/:id', async (req, res) => {
     const offers = await Offer.find({
       creator: mongoose.Types.ObjectId(User._id),
     });
-    console.log(offers);
+
     if (!offers || offers.length === 0) {
       return res
         .status(400)
