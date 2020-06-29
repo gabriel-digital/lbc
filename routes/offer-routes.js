@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const cloudinary = require('cloudinary').v2;
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const Offer = require('../models/offer-model');
 const isAuthenticated = require('../middlewares/is-authenticated');
 
@@ -74,7 +74,6 @@ router.get('/offers/with-count', async (req, res) => {
       search['title'] = new RegExp(req.query.title, 'i');
     }
     if (req.query.priceMin && req.query.priceMax) {
-  
       search['price'] = { $gte: req.query.priceMin, $lte: req.query.priceMax };
     } else if (req.query.priceMin && !req.query.max) {
       search['price'] = { $gte: req.query.priceMin };
@@ -106,7 +105,7 @@ router.get('/offers/with-count', async (req, res) => {
       skip = limit * (req.query.page - 1);
     }
     // for pages checks, we first need count, see below
-    const totalOffers = await Offer.find(search)
+    const totalOffers = await Offer.find(search);
     const count = totalOffers.length;
     const pages = Math.ceil(count / limit);
     // all settings done, let's find & answer something
@@ -118,8 +117,6 @@ router.get('/offers/with-count', async (req, res) => {
         path: 'creator',
         select: '-hash -salt -token -email -__v',
       });
-    
-    
     // now we can limit pagination
     if (req.query.page > pages) {
       return res
@@ -164,9 +161,10 @@ show offers with user id
 ************************* */
 router.get('/offers/user/:id', async (req, res) => {
   try {
-
-    const offers = await Offer.find({ creator: mongoose.Types.ObjectId(User._id)});
-    console.log(offers)
+    const offers = await Offer.find({
+      creator: mongoose.Types.ObjectId(User._id),
+    });
+    console.log(offers);
     if (!offers || offers.length === 0) {
       return res
         .status(400)
