@@ -118,7 +118,7 @@ router.get('/offers/with-count', async (req, res) => {
         select: '-hash -salt -token -email -__v',
       });
     // now we can limit pagination
-    if (req.query.page > pages) {
+    if (pages > 1 && req.query.page > pages) {
       return res
         .status(400)
         .json({ error: { message: 'Invalid page number' } });
